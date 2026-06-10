@@ -44,5 +44,5 @@ jobs:
         with:
           # 自动新建/使用仓库里的 gh-pages 分支，专门存放静态页面文件
           branch: gh-pages
-          # 要上传部署的文件夹名，就是 npm run build 生成的 build 目录
-          folder: build
+          # 要上传部署的文件夹名，就是 npm run build 生成的 dist 目录
+          folder: dist
