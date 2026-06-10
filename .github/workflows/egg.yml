@@ -31,10 +31,10 @@ jobs:
       # 步骤2：在虚拟机命令行执行shell命令
       - name: 安装依赖⬇️和项目打包📦
         # 如果我们想把下面的 install 和 build 命令放在一起写，则需要写 |
+        # 安装package.json里声明的所有npm依赖包
+        # 执行打包命令，生成静态产物build文件夹（React默认打包输出目录）
         run: |
-          # 安装package.json里声明的所有npm依赖包
           npm install
-          # 执行打包命令，生成静态产物build文件夹（React默认打包输出目录）
           npm run build
 
       # 步骤3：调用部署工具，把打包好的静态文件上传部署到 GitHub Pages
