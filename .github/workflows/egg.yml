@@ -1,0 +1,48 @@
+# 整个工作流的名称，在GitHub Actions页面会展示这个名字
+name: 打包React项目
+
+# 触发规则：什么时候执行这个CI流程
+on: push
+# 含义：只要往仓库任意分支执行git push推送代码，就自动运行下面整套流程
+
+# 权限配置，给工作流授予仓库写入权限
+permissions:
+  contents: write
+# 部署gh-pages分支需要往仓库提交文件，必须开启写入权限，否则部署会权限报错
+
+# 任务组，一个workflow可以包含多个并行/串行job
+jobs:
+  # 自定义任务ID：npm-build
+  npm-build:
+    # 这个任务的展示名称
+    name: npm-build工作
+    # 运行环境：使用GitHub提供的Ubuntu最新版虚拟机来执行任务
+    runs-on: ubuntu-latest
+
+    # 单个任务里的分步执行步骤，从上到下依次执行
+    steps:
+      # 步骤1：拉取你GitHub仓库里的全部代码到虚拟机
+      - name: 读取仓库内容 😊
+        uses: actions/checkout@v4
+        # uses 代表调用别人封装好的现成Action工具，v4是固定版本号
+        # actions/checkout 仓库地址：
+        # 为什么要使用这个 actions/checkout？后面我们在执行 npm install 的时候需要有 package.json 文件，而由于项目是运行在 ubuntu 的，所以目录文件等都是基于 ubuntu 的。如果不配置这个工具，那么就会报错说 package.json 文件找不到。
+
+      # 步骤2：在虚拟机命令行执行shell命令
+      - name: 安装依赖⬇️和项目打包📦
+        # 如果我们想把下面的 install 和 build 命令放在一起写，则需要写 |
+        run: |
+          # 安装package.json里声明的所有npm依赖包
+          npm install
+          # 执行打包命令，生成静态产物build文件夹（React默认打包输出目录）
+          npm run build
+
+      # 步骤3：调用部署工具，把打包好的静态文件上传部署到 GitHub Pages
+      - name: 部署🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        # 给这个部署Action传配置参数
+        with:
+          # 自动新建/使用仓库里的 gh-pages 分支，专门存放静态页面文件
+          branch: gh-pages
+          # 要上传部署的文件夹名，就是 npm run build 生成的 build 目录
+          folder: build
